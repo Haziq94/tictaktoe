@@ -1,4 +1,5 @@
 import tkinter as tk
+import random
 from tkinter import messagebox
 
 class TicTacToe:
@@ -17,16 +18,33 @@ class TicTacToe:
             self.buttons.append(button)
 
     def on_button_click(self, index):
-        if self.board[index] == " ":
+        if self.board[index] == " " and self.player == "X":
             self.board[index] = self.player
             self.buttons[index].config(text=self.player)
             if self.check_winner():
                 messagebox.showinfo("Tic Tac Toe",f"Player{self.player} wins!")
                 self.reset_games()
+                return
             elif " " not in self.board:
                 messagebox.showinfo("Tic Tac Toe", "It's a tie!")
+                self.reset_games()
+                return
             else:
-                self.player = "O" if self.player == "X" else "X"
+                self.player = "O"
+                self.computer_move()
+
+    def computer_move(self):
+        empty_cells = [i for i in range(9) if self.board[i] == " "]
+        index = random.choice(empty_cells)
+        self.board[index] = self.player
+        self.buttons[index].config(text = self.player)
+        if self.check_winner():
+            messagebox.showinfo("Tic Tac Toe", f"Player {self.player} wins!")
+            self.reset_games()
+        elif " " not in self.board:
+            messagebox.showinfo("Tic Tac Toe", "It's a tie!")
+        else:
+            self.player = "X"
 
     def check_winner(self):
         win_conditions = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
