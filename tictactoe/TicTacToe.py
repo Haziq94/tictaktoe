@@ -22,7 +22,7 @@ class TicTacToe:
             self.buttons[index].config(text=self.player)
             if self.check_winner():
                 messagebox.showinfo("Tic Tac Toe",f"Player{self.player} wins!")
-                self.reset_game()
+                self.reset_games()
             elif " " not in self.board:
                 messagebox.showinfo("Tic Tac Toe", "It's a tie!")
             else:
@@ -31,9 +31,9 @@ class TicTacToe:
     def check_winner(self):
         win_conditions = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
         for condition in win_conditions:
-            if self.board[condition[0]] == self.board[condition[1]] ==self.board[condition[2]] != " ":
+            if self.board[condition[0]] == self.board[condition[1]] == self.board[condition[2]] != " " :
                 return True
-            return False
+        return False
 
     def reset_games(self):
         self.board = [" " for _ in range(9)]
