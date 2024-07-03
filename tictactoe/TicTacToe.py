@@ -34,10 +34,24 @@ class TicTacToe:
                 self.computer_move()
 
     def computer_move(self):
-        empty_cells = [i for i in range(9) if self.board[i] == " "]
+        '''empty_cells = [i for i in range(9) if self.board[i] == " "]
         index = random.choice(empty_cells)
         self.board[index] = self.player
-        self.buttons[index].config(text = self.player)
+        self.buttons[index].config(text = self.player)'''
+
+        best_score = -float('inf')
+        best_move = None
+        for i in range(9):
+            if self.board[i] == " ":
+                self.board[i] = self.player
+                score = self.minimax(self.board,0,False)
+                self.board[i] = " "
+                if score > best_score:
+                    best_score = score
+                    best_move = i
+        self.board[best_move] = self.player
+        self.buttons[best_move].config(text = self.player)
+
         if self.check_winner():
             messagebox.showinfo("Tic Tac Toe", f"Player {self.player} wins!")
             self.reset_games()
@@ -45,6 +59,31 @@ class TicTacToe:
             messagebox.showinfo("Tic Tac Toe", "It's a tie!")
         else:
             self.player = "X"
+
+    def minimax(self,board,depth,is_maximizing):
+        if self.check_winner():
+            return 1 if self.player == "O" else -1
+        elif " " not in board:
+            return 0 
+
+        if is_maximizing :
+            best_score = -float('inf')
+            for i in range(9):
+                if board[i] == " ":
+                    board[i] = "O"
+                    score = self.minimax(board,depth+1, False)
+                    board[i] = " "
+                    best_score = max(score,best_score)
+            return best_score
+        else:
+            best_score = -float('inf')
+            for i in range(9):
+                if board[i] == " ":
+                    board[i] = "X"
+                    score = score = self.minimax(board,depth+1, True)
+                    board[i] = " "
+                    best_score = max(score,best_score)
+            return best_score
 
     def check_winner(self):
         win_conditions = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
