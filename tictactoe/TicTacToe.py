@@ -37,7 +37,7 @@ class TicTacToe:
         self.mode_var = tk.StringVar(value=self.game_mode)
 
         tk.Label(self.control_frame, text="Select Game Mode:", font=('Arial', 14)).pack(pady=5)
-        modes = [("Player vs Player", "PVP"), ("Player vs AI", "PVA"), ("AI vs AI", "AIA")]
+        modes = [("Player vs Player", "PVP"), ("Player vs AI", "PVA")]
         for text, mode in modes:
             tk.Radiobutton(self.control_frame, text=text, variable=self.mode_var, value=mode, 
                            font=('Arial', 12), command=self.set_game_mode).pack(anchor=tk.W)
@@ -51,7 +51,7 @@ class TicTacToe:
         self.reset_game()
 
     def on_button_click(self, index):
-        if self.board[index] == " " and (self.game_mode in ["PVP", "PVA"] or self.player == "X"):
+        if self.board[index] == " " and (self.game_mode == "PVP" or (self.game_mode == "PVA" and self.player == "X")):
             self.board[index] = self.player
             self.buttons[index].config(text=self.player, fg='#000000' if self.player == "X" else '#ff0000')
 
@@ -66,11 +66,10 @@ class TicTacToe:
             if self.game_mode == "PVP":
                 self.player = "O" if self.player == "X" else "X"
             elif self.game_mode == "PVA":
-                self.player = "O"
-                self.root.after(500, self.computer_move)
-            elif self.game_mode == "AIA":
-                self.player = "O" if self.player == "X" else "X"
-                self.root.after(500, self.ai_move)
+                if self.player == "X":
+                    self.player = "O"
+                    self.root.after(500, self.computer_move)
+                # No need to schedule a move if the game mode is not "PVA"
 
     def computer_move(self):
         move = self.find_best_move()
@@ -84,22 +83,6 @@ class TicTacToe:
             messagebox.showinfo("Tic Tac Toe", "It's a tie!")
         else:
             self.player = "X"
-
-    def ai_move(self):
-        move = self.find_best_move()
-        self.board[move] = self.player
-        self.buttons[move].config(text=self.player, fg='#ff0000' if self.player == "O" else '#000000')
-
-        if self.check_winner():
-            messagebox.showinfo("Tic Tac Toe", f"AI Player {self.player} wins!")
-            self.highlight_winner()
-        elif " " not in self.board:
-            messagebox.showinfo("Tic Tac Toe", "It's a tie!")
-        else:
-            # Alternate player
-            self.player = "X" if self.player == "O" else "O"
-            # Schedule the next move
-            self.root.after(500, self.ai_move)
 
     def find_best_move(self):
         for i in range(9):
@@ -142,8 +125,10 @@ class TicTacToe:
         for button in self.buttons:
             button.config(text=" ", bg='#f0f0f0', fg='#000000')
         self.player = "X"  # Start with 'X'
-        if self.game_mode == "AIA":
-            self.root.after(500, self.ai_move)  # Start AI vs AI with 'X'
+
+        if self.game_mode == "PVA":
+            # Schedule the first AI move if in Player vs AI mode
+            self.root.after(500, self.computer_move)
 
 if __name__ == "__main__":
     root = tk.Tk()
